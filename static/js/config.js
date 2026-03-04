@@ -7,7 +7,7 @@ const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20 MB
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
 function getWebhookUrl() {
-  return (window.__NOPE_CONFIG__ && window.__NOPE_CONFIG__.N8N_WEBHOOK_URL) || '';
+  return '/api/chat';
 }
 
 function getSessionId() {

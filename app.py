@@ -7,9 +7,9 @@ import time
 from typing import Optional
 
 import httpx
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, PlainTextResponse
+from fastapi.responses import FileResponse, PlainTextResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -268,6 +268,23 @@ async def check_image_endpoint(
         "validation_passed": validation.is_valid,
         "response_time_seconds": round(elapsed, 1),
     }
+
+
+@app.post("/api/chat")
+async def proxy_chat(request: Request):
+    """Proxy chat requests to the n8n webhook to avoid mixed-content errors."""
+    webhook_url = os.environ.get("N8N_WEBHOOK_URL", "")
+    if not webhook_url:
+        raise HTTPException(status_code=503, detail="N8N_WEBHOOK_URL not configured")
+
+    body = await request.body()
+    headers = {"Content-Type": request.headers.get("content-type", "application/json")}
+
+    async with httpx.AsyncClient(timeout=120) as client:
+        resp = await client.post(webhook_url, content=body, headers=headers)
+
+    return Response(content=resp.content, status_code=resp.status_code,
+                    media_type=resp.headers.get("content-type"))
 
 
 @app.get("/health")
