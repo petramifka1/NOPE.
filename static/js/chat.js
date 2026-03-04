@@ -195,9 +195,9 @@ function clearHistory() {
 
 function showWelcome() {
   appendMessage('bot', renderMarkdown(
-    "**Hey there! I'm NOPE.** &#128075;\n\n" +
-    "Send me a claim, news headline, or forward you're suspicious about, and I'll check it for you.\n\n" +
-    "You can also attach an image (screenshot, photo) using the &#128206; button.\n\n" +
+    "**Hey there! I'm NOPE.**\n\n" +
+    "Send me any claim, news headline, or suspicious forward and I'll tell you if it's real.\n\n" +
+    "You can also attach a screenshot using the paper clip button below.\n\n" +
     "_No judgment, just facts._"
   ));
 }
@@ -217,6 +217,21 @@ document.addEventListener('DOMContentLoaded', function() {
   } else {
     showWelcome();
   }
+
+  // Screenshot help popover
+  var helpBtn = document.getElementById('help-btn');
+  var helpPopover = document.getElementById('screenshot-popover');
+  helpBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    var isOpen = helpPopover.classList.toggle('visible');
+    helpBtn.classList.toggle('active', isOpen);
+    helpPopover.setAttribute('aria-hidden', String(!isOpen));
+  });
+  document.addEventListener('click', function() {
+    helpPopover.classList.remove('visible');
+    helpBtn.classList.remove('active');
+    helpPopover.setAttribute('aria-hidden', 'true');
+  });
 
   // Send on button click
   sendBtn.addEventListener('click', sendMessage);

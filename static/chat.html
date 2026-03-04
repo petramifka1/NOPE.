@@ -49,7 +49,29 @@
       <input type="file" id="file-input" accept="image/jpeg,image/png,image/gif,image/webp">
       <button class="attach-btn" id="attach-btn" title="Attach image">&#128206;</button>
       <textarea id="chat-input" rows="1" placeholder="Paste a claim or news headline..."></textarea>
+      <button class="help-btn" id="help-btn" title="How to take a screenshot">?</button>
       <button class="send-btn" id="send-btn" title="Send message">&#10148;</button>
+
+      <!-- Screenshot help popover -->
+      <div class="screenshot-popover" id="screenshot-popover" aria-hidden="true">
+        <div class="popover-title">How to take a screenshot</div>
+        <div class="popover-row">
+          <span class="popover-device">iPhone</span>
+          <span class="popover-instruction">Side button + Volume Up — saves to Photos</span>
+        </div>
+        <div class="popover-row">
+          <span class="popover-device">Android</span>
+          <span class="popover-instruction">Power button + Volume Down — saves to Gallery</span>
+        </div>
+        <div class="popover-row">
+          <span class="popover-device">PC</span>
+          <span class="popover-instruction">Print Screen key, then paste into a photo app</span>
+        </div>
+        <div class="popover-row">
+          <span class="popover-device">Mac</span>
+          <span class="popover-instruction">Shift + Command + 4 — saves to Desktop</span>
+        </div>
+      </div>
     </div>
   </div>
 </body>
