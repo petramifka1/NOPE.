@@ -1,35 +1,43 @@
-# ClearCheck
+# NOPE
 
-**Deepfake & Misinformation Shield for Older Adults**
+**Deepfake, Misinformation & Scam Shield for Older Adults**
 
-ClearCheck is a verification tool that helps older adults (55+) check whether online content is trustworthy. Paste any claim into the N8N chat, and get a plain-language verdict backed by multiple independent sources.
+NOPE is a verification tool that helps older adults (55+) check whether online content is trustworthy. Paste any claim, URL, or image into the chat and get a plain-language verdict backed by multiple independent sources — plus scam detection that flags phishing, fraud, and social engineering tactics.
 
 ## How It Works
 
 ```
-N8N Chat UI → Chat Trigger → HTTP Request → FastAPI Server
-                                                  │
-                                     ┌────────────┼────────────┐
-                                     ▼            ▼            ▼
-                                 Pinecone      Tavily     Google Fact
-                                (known misinfo) (web search) Check API
-                                     └────────────┼────────────┘
-                                                  ▼
-                                     LangGraph Agent (Claude)
-                                       ┌─────────┴─────────┐
-                                       ▼                    ▼
-                                 Claude Analysis     LLM Validation
-                                     └─────────┬─────────┘
-                                                ▼
-                                         SQLite Logging
-                                                ▼
-                                   Formatted response → N8N Chat
+Frontend (static/index.html)  or  N8N Chat UI
+              │
+              ▼
+         FastAPI Server (app.py)
+              │
+   ┌──────────┼──────────┬──────────────┐
+   ▼          ▼          ▼              ▼
+Pinecone   Tavily    Google Fact    Scam Analyzer
+(known      (web      Check API     ├─ Pattern matching (50 scam patterns)
+ misinfo)   search)                 ├─ URL safety (Google Safe Browsing)
+   │          │          │          └─ Social engineering detection
+   └──────────┼──────────┴──────────────┘
+              ▼
+   LangGraph Agent (Claude)
+     ┌────────┴────────┐
+     ▼                 ▼
+Claude Analysis   LLM Validation
+     └────────┬────────┘
+              ▼
+       SQLite Logging
+              ▼
+    Formatted response → Chat
 ```
 
-1. **Pinecone** searches a curated knowledge base of 20 known misinformation patterns
-2. **Tavily** runs a real-time web search for current information
-3. **Google Fact Check API** queries published fact-checks from trusted organizations
-4. **LangGraph + Claude** analyzes all evidence with multi-step reasoning and returns a validated structured verdict
+### Evidence Sources
+
+1. **Pinecone** — searches a curated knowledge base of 20 known misinformation patterns
+2. **Tavily** — real-time web search for current information
+3. **Google Fact Check API** — published fact-checks from trusted organizations
+4. **Scam Analyzer** — pattern-matches against 50 known scam templates, detects social engineering tactics, and checks URL safety via Google Safe Browsing
+5. **Image Analysis** — reverse image search (SerpAPI / Google Lens) and AI-powered image description for visual content verification
 
 ## Tech Stack
 
@@ -37,11 +45,14 @@ N8N Chat UI → Chat Trigger → HTTP Request → FastAPI Server
 |-----------|-----------|
 | LLM | Claude (Anthropic) |
 | Agent Orchestration | LangGraph |
-| Workflow & Chat UI | N8N (built-in chat trigger) |
+| Frontend | Custom HTML/CSS/JS (`static/`) |
+| Workflow (alternative) | N8N (built-in chat trigger) |
 | Vector Store | Pinecone |
 | Embeddings | OpenAI text-embedding-3-small |
 | Web Search | Tavily |
 | Fact-Checking | Google Fact Check API |
+| Scam Detection | Custom pattern analyzer + Google Safe Browsing |
+| Image Analysis | Pillow + SerpAPI (Google Lens) |
 | API Server | FastAPI |
 | Database | SQLite |
 
@@ -50,7 +61,6 @@ N8N Chat UI → Chat Trigger → HTTP Request → FastAPI Server
 ### Prerequisites
 
 - Python 3.11+
-- N8N instance (cloud or self-hosted)
 - API keys for: Anthropic, OpenAI, Pinecone, Tavily, Google Fact Check
 
 ### Installation
@@ -82,28 +92,30 @@ TAVILY_API_KEY=
 GOOGLE_FACTCHECK_API_KEY=
 ```
 
+Optional (enable additional features):
+
+```
+GOOGLE_SAFE_BROWSING_API_KEY=   # URL safety checks in scam detection
+SERPAPI_API_KEY=                 # Image reverse search via Google Lens
+```
+
 ### Seed the Knowledge Base
 
 ```bash
 python -m src.seed_knowledge_base
 ```
 
-### Start the API Server
+### Start the Server
 
 ```bash
 python app.py
 ```
 
-The server runs on `http://localhost:8000`. Verify with `GET /health`.
+The server runs on `http://localhost:8000`.
 
-### Import the N8N Workflow
-
-1. Open your N8N instance
-2. Go to **Workflows → Import from File**
-3. Select `n8n_workflow.json`
-4. Update the HTTP Request node URL if your server is not on `localhost:8000`
-5. Activate the workflow
-6. Open the chat UI from the Chat Trigger node
+- **Custom frontend:** open `http://localhost:8000/static/index.html`
+- **Health check:** `GET /health`
+- **N8N workflow (alternative):** import `n8n_workflow.json` into your N8N instance
 
 ### Run Evaluation
 
@@ -115,23 +127,37 @@ python evaluate.py
 
 ```
 clearcheck/
-├── app.py                          # FastAPI server (called by N8N)
-├── evaluate.py                     # Test dataset evaluation script
-├── n8n_workflow.json               # N8N workflow (import into N8N)
+├── app.py                            # FastAPI server
+├── evaluate.py                       # Test dataset evaluation script
+├── n8n_workflow.json                 # N8N workflow (text verification)
+├── n8n_image_workflow.json           # N8N workflow (image verification)
 ├── requirements.txt
+├── Dockerfile
+├── railway.toml
 ├── src/
 │   ├── __init__.py
-│   ├── config.py                   # Environment variables & constants
-│   ├── schemas.py                  # Pydantic models & LangGraph state
-│   ├── evidence.py                 # Pinecone, Tavily, Google Fact Check
-│   ├── agent.py                    # LangGraph agent (Claude + validation)
-│   ├── audit_log.py                # SQLite audit logging
-│   └── seed_knowledge_base.py      # Seed Pinecone with misinfo patterns
+│   ├── config.py                     # Environment variables & constants
+│   ├── schemas.py                    # Pydantic models & LangGraph state
+│   ├── evidence.py                   # Pinecone, Tavily, Google Fact Check
+│   ├── agent.py                      # LangGraph agent (Claude + validation)
+│   ├── scam_analyzer.py              # Scam pattern matching & detection
+│   ├── url_safety.py                 # Google Safe Browsing URL checker
+│   ├── image_agent.py                # Image verification agent
+│   ├── image_evidence.py             # Reverse image search & analysis
+│   ├── audit_log.py                  # SQLite audit logging
+│   ├── retry.py                      # Retry utilities
+│   └── seed_knowledge_base.py        # Seed Pinecone with misinfo patterns
 ├── data/
 │   ├── misinformation_patterns.json  # 20 curated misinfo patterns
+│   ├── scam_patterns.json            # 50 known scam patterns
 │   └── test_dataset.json             # 20-item test set with ground truth
-├── .env
-├── .gitignore
+├── static/
+│   ├── index.html                    # Landing page & main UI
+│   ├── chat.html                     # Chat interface
+│   ├── css/                          # Stylesheets
+│   ├── js/                           # Frontend scripts
+│   └── assets/                       # Images & static assets
+├── .env.example
 ├── PROJECT_PLAN.md
 └── README.md
 ```

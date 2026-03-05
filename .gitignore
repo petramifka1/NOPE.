@@ -30,8 +30,13 @@ Thumbs.db
 
 # Database
 *.db
+*.db-shm
+*.db-wal
 *.sqlite
 *.sqlite3
+
+# Claude Code
+.claude/
 
 # Evaluation results
 data/evaluation_results.json

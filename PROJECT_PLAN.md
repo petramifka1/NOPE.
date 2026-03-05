@@ -1,3 +1,5 @@
+> **Note:** This was the original project plan written when the project was called "ClearCheck". The project has since been rebranded to **NOPE**. The plan is preserved here for historical reference.
+
 # ClearCheck — Deepfake & Misinformation Shield for Older Adults
 
 ## 1. Use Case
