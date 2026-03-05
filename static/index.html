@@ -1,768 +1,1050 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NOPE — Your Personal Misinformation Detector</title>
-<link rel="icon" href="/static/assets/favicon.ico">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=Crimson+Pro:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --coral: #FF6B5A;
-    --navy: #1A1F3D;
-    --cream: #FFF8F0;
-    --mint: #4ECDC4;
-    --gold: #FFD93D;
-    --soft-gray: #8E8EA0;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'Outfit', sans-serif;
-    background: var(--cream);
-    color: var(--navy);
-    overflow-x: hidden;
-  }
-
-  /* ── HERO ─────────────────────────────── */
-  .hero {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 3rem 1.5rem;
-    position: relative;
-    background:
-      radial-gradient(ellipse at 20% 80%, rgba(78, 205, 196, 0.15) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 20%, rgba(255, 107, 90, 0.12) 0%, transparent 50%),
-      var(--cream);
-  }
-
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: var(--navy);
-    color: var(--cream);
-    padding: 0.5rem 1.2rem;
-    border-radius: 100px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    animation: fadeDown 0.8s ease-out;
-    margin-bottom: 2rem;
-  }
-
-  .badge .dot {
-    width: 8px;
-    height: 8px;
-    background: var(--mint);
-    border-radius: 50%;
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  .logo {
-    font-size: clamp(5rem, 15vw, 12rem);
-    font-weight: 900;
-    line-height: 0.9;
-    letter-spacing: -0.04em;
-    animation: fadeUp 0.8s ease-out 0.2s both;
-    position: relative;
-  }
-
-  .logo span {
-    position: relative;
-    display: inline-block;
-  }
-
-  .logo .strike {
-    position: absolute;
-    top: 50%;
-    left: -5%;
-    width: 110%;
-    height: 8px;
-    background: var(--coral);
-    border-radius: 4px;
-    transform: rotate(-2deg);
-    animation: strikeIn 0.5s ease-out 1s both;
-  }
-
-  .tagline {
-    font-family: 'Crimson Pro', serif;
-    font-style: italic;
-    font-size: clamp(1.1rem, 2.5vw, 1.6rem);
-    color: var(--soft-gray);
-    margin-top: 1rem;
-    animation: fadeUp 0.8s ease-out 0.4s both;
-  }
-
-  .headline {
-    font-size: clamp(1.8rem, 4vw, 3rem);
-    font-weight: 700;
-    line-height: 1.2;
-    max-width: 720px;
-    margin-top: 3rem;
-    animation: fadeUp 0.8s ease-out 0.6s both;
-  }
-
-  .headline .highlight {
-    background: linear-gradient(120deg, var(--gold) 0%, var(--gold) 100%);
-    background-size: 100% 35%;
-    background-position: 0 85%;
-    background-repeat: no-repeat;
-    padding: 0 0.1em;
-  }
-
-  .subtext {
-    font-size: 1.1rem;
-    color: var(--soft-gray);
-    max-width: 560px;
-    line-height: 1.7;
-    margin-top: 1.5rem;
-    animation: fadeUp 0.8s ease-out 0.8s both;
-  }
-
-  .hero-cta {
-    margin-top: 2.5rem;
-    animation: fadeUp 0.8s ease-out 1s both;
-  }
-
-  .scroll-hint {
-    margin-top: 4rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--soft-gray);
-    font-size: 0.8rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    animation: fadeUp 0.8s ease-out 1.2s both;
-  }
-
-  .scroll-arrow {
-    width: 20px;
-    height: 20px;
-    border-right: 2px solid var(--soft-gray);
-    border-bottom: 2px solid var(--soft-gray);
-    transform: rotate(45deg);
-    animation: bounce 1.5s ease-in-out infinite;
-  }
-
-  /* ── CARDS ────────────────────────────── */
-  .cards-section {
-    padding: 2rem 1.5rem 4rem;
-    max-width: 960px;
-    margin: 0 auto;
-  }
-
-  .section-label {
-    text-align: center;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--coral);
-    margin-bottom: 2rem;
-  }
-
-  .cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .card {
-    background: white;
-    border-radius: 20px;
-    padding: 2rem;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 4px 24px rgba(26, 31, 61, 0.06);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    animation: fadeUp 0.8s ease-out both;
-  }
-
-  .card:nth-child(1) { animation-delay: 0.3s; }
-  .card:nth-child(2) { animation-delay: 0.5s; }
-  .card:nth-child(3) { animation-delay: 0.7s; }
-
-  .card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 32px rgba(26, 31, 61, 0.12);
-  }
-
-  .card-emoji {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .card h3 {
-    font-size: 1.15rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-  }
-
-  .card p {
-    font-size: 0.95rem;
-    color: var(--soft-gray);
-    line-height: 1.6;
-  }
-
-  .card::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 4px;
-  }
-
-  .card:nth-child(1)::after { background: var(--coral); }
-  .card:nth-child(2)::after { background: var(--mint); }
-  .card:nth-child(3)::after { background: var(--gold); }
-
-  /* ── HOW IT WORKS ─────────────────────── */
-  .how-section {
-    background: var(--navy);
-    color: var(--cream);
-    padding: 5rem 1.5rem;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .how-section::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle at 60% 40%, rgba(78, 205, 196, 0.08) 0%, transparent 40%);
-    pointer-events: none;
-  }
-
-  .how-section h2 {
-    font-size: clamp(1.8rem, 4vw, 2.5rem);
-    font-weight: 700;
-    max-width: 600px;
-    margin: 0 auto 0.75rem;
-    line-height: 1.25;
-  }
-
-  .how-section .how-subtext {
-    font-size: 1.05rem;
-    color: rgba(255, 248, 240, 0.6);
-    max-width: 460px;
-    margin: 0 auto 3rem;
-    line-height: 1.7;
-  }
-
-  .step-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1rem;
-    margin: 0 auto 3rem;
-    max-width: 760px;
-  }
-
-  .step {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    background: rgba(255, 248, 240, 0.07);
-    border: 1px solid rgba(255, 248, 240, 0.1);
-    border-radius: 14px;
-    padding: 1.1rem 1.5rem;
-    font-size: 0.95rem;
-    backdrop-filter: blur(4px);
-    text-align: left;
-    max-width: 280px;
-    flex: 1 1 220px;
-  }
-
-  .step-num {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: var(--coral);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.85rem;
-    font-weight: 700;
-    flex-shrink: 0;
-  }
-
-  .step-text strong {
-    display: block;
-    font-weight: 700;
-    margin-bottom: 0.2rem;
-  }
-
-  .step-text span {
-    font-size: 0.85rem;
-    color: rgba(255, 248, 240, 0.55);
-  }
-
-  /* ── EXAMPLES TICKER ──────────────────── */
-  .examples-section {
-    padding: 4rem 1.5rem;
-    max-width: 800px;
-    margin: 0 auto;
-    text-align: center;
-  }
-
-  .examples-section h2 {
-    font-size: clamp(1.4rem, 3vw, 2rem);
-    font-weight: 700;
-    margin-bottom: 0.75rem;
-  }
-
-  .examples-section .sub {
-    color: var(--soft-gray);
-    font-size: 1rem;
-    margin-bottom: 2.5rem;
-    line-height: 1.6;
-  }
-
-  .example-pills {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.8rem;
-  }
-
-  .pill {
-    background: white;
-    border: 1.5px solid rgba(26, 31, 61, 0.1);
-    border-radius: 100px;
-    padding: 0.6rem 1.2rem;
-    font-size: 0.9rem;
-    color: var(--navy);
-    box-shadow: 0 2px 12px rgba(26, 31, 61, 0.05);
-    transition: all 0.2s ease;
-    cursor: default;
-  }
-
-  .pill:hover {
-    border-color: var(--coral);
-    color: var(--coral);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(255, 107, 90, 0.15);
-  }
-
-  .pill.gold { border-color: var(--gold); }
-  .pill.mint { border-color: var(--mint); }
-
-  /* ── TESTIMONIALS ────────────────────── */
-  .testimonials-section {
-    padding: 4rem 1.5rem 5rem;
-    max-width: 1040px;
-    margin: 0 auto;
-    text-align: center;
-  }
-
-  .testimonials-title {
-    font-size: clamp(1.4rem, 3vw, 2rem);
-    font-weight: 700;
-    margin-bottom: 3rem;
-    color: var(--navy);
-  }
-
-  .testimonials-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
-    text-align: left;
-  }
-
-  .testimonial-card {
-    background: white;
-    border-radius: 20px;
-    padding: 1.75rem;
-    box-shadow: 0 4px 24px rgba(26, 31, 61, 0.06);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    position: relative;
-  }
-
-  .testimonial-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 32px rgba(26, 31, 61, 0.12);
-  }
-
-  .testimonial-card:nth-child(3n+1)::before { background: var(--coral); }
-  .testimonial-card:nth-child(3n+2)::before { background: var(--mint); }
-  .testimonial-card:nth-child(3n+3)::before { background: var(--gold); }
-
-  .testimonial-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%;
-    height: 4px;
-    border-radius: 20px 20px 0 0;
-  }
-
-  .stars {
-    color: var(--gold);
-    font-size: 0.95rem;
-    letter-spacing: 0.1em;
-  }
-
-  .quote {
-    font-family: 'Crimson Pro', serif;
-    font-style: italic;
-    font-size: 1.1rem;
-    color: var(--navy);
-    line-height: 1.6;
-    flex: 1;
-  }
-
-  .attrib {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--soft-gray);
-    letter-spacing: 0.02em;
-  }
-
-  /* ── CTA ──────────────────────────────── */
-  .cta-area {
-    background: var(--cream);
-    padding: 4rem 1.5rem 5rem;
-    text-align: center;
-  }
-
-  .thought-bubble {
-    font-family: 'Crimson Pro', serif;
-    font-style: italic;
-    font-size: clamp(1.3rem, 3vw, 1.8rem);
-    color: var(--navy);
-    max-width: 640px;
-    margin: 0 auto 2.5rem;
-    line-height: 1.55;
-    position: relative;
-  }
-
-  .thought-bubble::before {
-    content: '\201C';
-    font-size: 4rem;
-    color: var(--coral);
-    position: absolute;
-    top: -1.5rem;
-    left: -0.5rem;
-    opacity: 0.3;
-    font-family: 'Outfit', sans-serif;
-  }
-
-  .cta-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    background: var(--coral);
-    color: white;
-    font-family: 'Outfit', sans-serif;
-    font-size: 1.15rem;
-    font-weight: 700;
-    padding: 1.1rem 2.5rem;
-    border-radius: 100px;
-    border: none;
-    cursor: pointer;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 20px rgba(255, 107, 90, 0.35);
-  }
-
-  .cta-btn:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 8px 30px rgba(255, 107, 90, 0.45);
-  }
-
-  .cta-btn .arrow {
-    transition: transform 0.3s ease;
-  }
-
-  .cta-btn:hover .arrow {
-    transform: translateX(4px);
-  }
-
-  .fine-print {
-    margin-top: 1.5rem;
-    font-size: 0.85rem;
-    color: var(--soft-gray);
-  }
-
-  .fine-print strong {
-    color: var(--mint);
-    font-weight: 700;
-  }
-
-  /* ── TRUST BAR ────────────────────────── */
-  .trust-bar {
-    background: white;
-    border-top: 1px solid rgba(26, 31, 61, 0.06);
-    border-bottom: 1px solid rgba(26, 31, 61, 0.06);
-    padding: 1.5rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 2.5rem;
-  }
-
-  .trust-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--soft-gray);
-  }
-
-  .trust-item .icon {
-    font-size: 1.1rem;
-  }
-
-  /* ── FOOTER ───────────────────────────── */
-  footer {
-    text-align: center;
-    padding: 2rem 1.5rem;
-    font-size: 0.8rem;
-    color: var(--soft-gray);
-    border-top: 1px solid rgba(26, 31, 61, 0.08);
-  }
-
-  /* ── ANIMATIONS ───────────────────────── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes fadeDown {
-    from { opacity: 0; transform: translateY(-16px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes strikeIn {
-    from { width: 0; }
-    to { width: 110%; }
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-
-  @keyframes bounce {
-    0%, 100% { transform: rotate(45deg) translateY(0); }
-    50% { transform: rotate(45deg) translateY(4px); }
-  }
-
-  @media (max-width: 600px) {
-    .step-list { flex-direction: column; align-items: center; }
-    .step { width: 100%; max-width: 340px; }
-    .trust-bar { gap: 1.5rem; }
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOPE — Your Personal Misinformation & Scam Detector</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;900&family=Crimson+Pro:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --coral: #FF6B5A;
+            --navy: #1A1F3D;
+            --cream: #FFF8F0;
+            --mint: #4ECDC4;
+            --gold: #FFD93D;
+            --soft-gray: #8E8EA0;
+            --blush: #FF85A1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--cream);
+            color: var(--navy);
+            overflow-x: hidden;
+        }
+
+        /* ── HERO ─────────────────────────────── */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 3rem 1.5rem;
+            position: relative;
+            background: radial-gradient(ellipse at 20% 80%, rgba(78, 205, 196, 0.15) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 20%, rgba(255, 107, 90, 0.12) 0%, transparent 50%),
+                        var(--cream);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--navy);
+            color: var(--cream);
+            padding: 0.5rem 1.2rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            animation: fadeDown 0.8s ease-out;
+            margin-bottom: 2rem;
+        }
+
+        .badge .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--mint);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .badge .new-pill {
+            background: var(--gold);
+            color: var(--navy);
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 0.15rem 0.5rem;
+            border-radius: 100px;
+            letter-spacing: 0.08em;
+        }
+
+        .logo {
+            font-size: clamp(5rem, 15vw, 12rem);
+            font-weight: 900;
+            line-height: 0.9;
+            letter-spacing: -0.04em;
+            animation: fadeUp 0.8s ease-out 0.2s both;
+            position: relative;
+        }
+
+        .logo span {
+            position: relative;
+            display: inline-block;
+        }
+
+        .logo .strike {
+            position: absolute;
+            top: 50%;
+            left: -5%;
+            width: 110%;
+            height: 8px;
+            background: var(--coral);
+            border-radius: 4px;
+            transform: rotate(-2deg);
+            animation: strikeIn 0.5s ease-out 1s both;
+        }
+
+        .tagline {
+            font-family: 'Crimson Pro', serif;
+            font-style: italic;
+            font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+            color: var(--soft-gray);
+            margin-top: 1rem;
+            animation: fadeUp 0.8s ease-out 0.4s both;
+        }
+
+        .headline {
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-weight: 700;
+            line-height: 1.2;
+            max-width: 720px;
+            margin-top: 3rem;
+            animation: fadeUp 0.8s ease-out 0.6s both;
+        }
+
+        .headline .highlight {
+            background: linear-gradient(120deg, var(--gold) 0%, var(--gold) 100%);
+            background-size: 100% 35%;
+            background-position: 0 85%;
+            background-repeat: no-repeat;
+            padding: 0 0.1em;
+        }
+
+        .subtext {
+            font-size: 1.1rem;
+            color: var(--soft-gray);
+            max-width: 560px;
+            line-height: 1.7;
+            margin-top: 1.5rem;
+            animation: fadeUp 0.8s ease-out 0.8s both;
+        }
+
+        .hero-cta {
+            margin-top: 2.5rem;
+            animation: fadeUp 0.8s ease-out 1s both;
+        }
+
+        .scroll-hint {
+            margin-top: 4rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--soft-gray);
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            animation: fadeUp 0.8s ease-out 1.2s both;
+        }
+
+        .scroll-arrow {
+            width: 20px;
+            height: 20px;
+            border-right: 2px solid var(--soft-gray);
+            border-bottom: 2px solid var(--soft-gray);
+            transform: rotate(45deg);
+            animation: bounce 1.5s ease-in-out infinite;
+        }
+
+        /* ── CARDS ────────────────────────────── */
+        .cards-section {
+            padding: 2rem 1.5rem 4rem;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--coral);
+            margin-bottom: 2rem;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(26, 31, 61, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeUp 0.8s ease-out both;
+        }
+
+        .card:nth-child(1) { animation-delay: 0.3s; }
+        .card:nth-child(2) { animation-delay: 0.5s; }
+        .card:nth-child(3) { animation-delay: 0.7s; }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(26, 31, 61, 0.12);
+        }
+
+        .card-emoji {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            color: var(--soft-gray);
+            line-height: 1.6;
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .card:nth-child(1)::after { background: var(--coral); }
+        .card:nth-child(2)::after { background: var(--mint); }
+        .card:nth-child(3)::after { background: var(--gold); }
+
+        /* ── SCAM SHIELD ──────────────────────── */
+        .scam-section {
+            background: linear-gradient(150deg, #1A1F3D 0%, #231B3F 60%, #1A1F3D 100%);
+            padding: 5rem 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scam-section::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 217, 61, 0.07) 0%, transparent 65%);
+            pointer-events: none;
+        }
+
+        .scam-section::after {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 133, 161, 0.07) 0%, transparent 65%);
+            pointer-events: none;
+        }
+
+        .scam-section .section-label {
+            color: var(--gold);
+        }
+
+        .scam-section h2 {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 700;
+            color: var(--cream);
+            max-width: 600px;
+            margin: 0 auto 1rem;
+            line-height: 1.25;
+        }
+
+        .scam-intro-text {
+            color: rgba(255, 248, 240, 0.6);
+            font-size: 1.05rem;
+            max-width: 520px;
+            margin: 0 auto 3rem;
+            line-height: 1.7;
+        }
+
+        .scam-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            max-width: 960px;
+            margin: 0 auto 3rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .scam-card {
+            background: rgba(255, 248, 240, 0.05);
+            border: 1px solid rgba(255, 248, 240, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: left;
+            backdrop-filter: blur(4px);
+            transition: transform 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scam-card:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 248, 240, 0.09);
+            border-color: rgba(255, 248, 240, 0.2);
+        }
+
+        .scam-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .scam-card.authority::before { background: var(--coral); }
+        .scam-card.romance::before { background: var(--blush); }
+        .scam-card.financial::before { background: var(--gold); }
+
+        .scam-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .scam-tag {
+            display: inline-block;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 0.2rem 0.7rem;
+            border-radius: 100px;
+            margin-bottom: 0.75rem;
+            color: var(--navy);
+        }
+
+        .authority .scam-tag { background: var(--coral); color: white; }
+        .romance .scam-tag { background: var(--blush); color: white; }
+        .financial .scam-tag { background: var(--gold); color: var(--navy); }
+
+        .scam-card h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--cream);
+            margin-bottom: 0.75rem;
+        }
+
+        .scam-example {
+            font-family: 'Crimson Pro', serif;
+            font-style: italic;
+            font-size: 1rem;
+            color: rgba(255, 248, 240, 0.8);
+            background: rgba(255, 248, 240, 0.05);
+            border-left: 3px solid rgba(255, 248, 240, 0.15);
+            padding: 0.75rem 1rem;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .scam-tell {
+            font-size: 0.9rem;
+            color: rgba(255, 248, 240, 0.5);
+            line-height: 1.6;
+        }
+
+        .scam-tell strong {
+            color: rgba(255, 248, 240, 0.75);
+            font-weight: 600;
+        }
+
+        .scam-footer-note {
+            color: rgba(255, 248, 240, 0.45);
+            font-size: 0.9rem;
+            max-width: 480px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── HOW IT WORKS ─────────────────────── */
+        .how-section {
+            background: var(--navy);
+            color: var(--cream);
+            padding: 5rem 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .how-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 60% 40%, rgba(78, 205, 196, 0.08) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        .how-section h2 {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 700;
+            max-width: 600px;
+            margin: 0 auto 0.75rem;
+            line-height: 1.25;
+        }
+
+        .how-section .how-subtext {
+            font-size: 1.05rem;
+            color: rgba(255, 248, 240, 0.6);
+            max-width: 460px;
+            margin: 0 auto 3rem;
+            line-height: 1.7;
+        }
+
+        .step-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin: 0 auto 3rem;
+            max-width: 760px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(255, 248, 240, 0.07);
+            border: 1px solid rgba(255, 248, 240, 0.1);
+            border-radius: 14px;
+            padding: 1.1rem 1.5rem;
+            font-size: 0.95rem;
+            backdrop-filter: blur(4px);
+            text-align: left;
+            max-width: 280px;
+            flex: 1 1 220px;
+        }
+
+        .step-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--coral);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-text strong {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+
+        .step-text span {
+            font-size: 0.85rem;
+            color: rgba(255, 248, 240, 0.55);
+        }
+
+        /* ── EXAMPLES TICKER ──────────────────── */
+        .examples-section {
+            padding: 4rem 1.5rem;
+            max-width: 860px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .examples-section h2 {
+            font-size: clamp(1.4rem, 3vw, 2rem);
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .examples-section .sub {
+            color: var(--soft-gray);
+            font-size: 1rem;
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+        }
+
+        .example-pills {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.8rem;
+        }
+
+        .pill {
+            background: white;
+            border: 1.5px solid rgba(26, 31, 61, 0.1);
+            border-radius: 100px;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+            color: var(--navy);
+            box-shadow: 0 2px 12px rgba(26, 31, 61, 0.05);
+            transition: all 0.2s ease;
+            cursor: default;
+        }
+
+        .pill:hover {
+            border-color: var(--coral);
+            color: var(--coral);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(255, 107, 90, 0.15);
+        }
+
+        .pill.scam {
+            background: rgba(26, 31, 61, 0.04);
+            border-color: rgba(26, 31, 61, 0.15);
+        }
+
+        .pill.scam:hover {
+            border-color: var(--blush);
+            color: #d4607a;
+            box-shadow: 0 4px 16px rgba(255, 133, 161, 0.2);
+        }
+
+        .pill-divider {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 0.5rem 0;
+            color: var(--soft-gray);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .pill-divider::before,
+        .pill-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(26, 31, 61, 0.1);
+        }
+
+        /* ── TESTIMONIALS ────────────────────── */
+        .testimonials-section {
+            padding: 4rem 1.5rem 5rem;
+            max-width: 1040px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .testimonials-title {
+            font-size: clamp(1.4rem, 3vw, 2rem);
+            font-weight: 700;
+            margin-bottom: 3rem;
+            color: var(--navy);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            text-align: left;
+        }
+
+        .testimonial-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.75rem;
+            box-shadow: 0 4px 24px rgba(26, 31, 61, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            position: relative;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(26, 31, 61, 0.12);
+        }
+
+        .testimonial-card:nth-child(3n+1)::before { background: var(--coral); }
+        .testimonial-card:nth-child(3n+2)::before { background: var(--mint); }
+        .testimonial-card:nth-child(3n+3)::before { background: var(--gold); }
+        .testimonial-card.scam-testimonial::before { background: var(--blush); }
+
+        .testimonial-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .stars {
+            color: var(--gold);
+            font-size: 0.95rem;
+            letter-spacing: 0.1em;
+        }
+
+        .quote {
+            font-family: 'Crimson Pro', serif;
+            font-style: italic;
+            font-size: 1.1rem;
+            color: var(--navy);
+            line-height: 1.6;
+            flex: 1;
+        }
+
+        .attrib {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--soft-gray);
+            letter-spacing: 0.02em;
+        }
+
+        /* ── CTA ──────────────────────────────── */
+        .cta-area {
+            background: var(--cream);
+            padding: 4rem 1.5rem 5rem;
+            text-align: center;
+        }
+
+        .thought-bubble {
+            font-family: 'Crimson Pro', serif;
+            font-style: italic;
+            font-size: clamp(1.3rem, 3vw, 1.8rem);
+            color: var(--navy);
+            max-width: 640px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.55;
+            position: relative;
+        }
+
+        .thought-bubble::before {
+            content: '\201C';
+            font-size: 4rem;
+            color: var(--coral);
+            position: absolute;
+            top: -1.5rem;
+            left: -0.5rem;
+            opacity: 0.3;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--coral);
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            padding: 1.1rem 2.5rem;
+            border-radius: 100px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(255, 107, 90, 0.35);
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 30px rgba(255, 107, 90, 0.45);
+        }
+
+        .cta-btn .arrow {
+            transition: transform 0.3s ease;
+        }
+
+        .cta-btn:hover .arrow {
+            transform: translateX(4px);
+        }
+
+        .fine-print {
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--soft-gray);
+        }
+
+        .fine-print strong {
+            color: var(--mint);
+            font-weight: 700;
+        }
+
+        /* ── TRUST BAR ────────────────────────── */
+        .trust-bar {
+            background: white;
+            border-top: 1px solid rgba(26, 31, 61, 0.06);
+            border-bottom: 1px solid rgba(26, 31, 61, 0.06);
+            padding: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2.5rem;
+        }
+
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--soft-gray);
+        }
+
+        .trust-item .icon {
+            font-size: 1.1rem;
+        }
+
+        /* ── FOOTER ───────────────────────────── */
+        footer {
+            text-align: center;
+            padding: 2rem 1.5rem;
+            font-size: 0.8rem;
+            color: var(--soft-gray);
+            border-top: 1px solid rgba(26, 31, 61, 0.08);
+        }
+
+        /* ── ANIMATIONS ───────────────────────── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes strikeIn {
+            from { width: 0; }
+            to   { width: 110%; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.4; }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: rotate(45deg) translateY(0); }
+            50%       { transform: rotate(45deg) translateY(4px); }
+        }
+
+        @media (max-width: 600px) {
+            .step-list { flex-direction: column; align-items: center; }
+            .step { width: 100%; max-width: 340px; }
+            .trust-bar { gap: 1.5rem; }
+            .scam-cards { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
 
-<!-- ── HERO ──────────────────────────────────── -->
-<section class="hero">
-  <div class="badge">
-    <span class="dot"></span>
-    Free to use &middot; No sign-up needed
-  </div>
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="badge">
+            <span class="dot"></span>
+            Free to use · No sign-up needed
+            <span class="new-pill">+ SCAM SHIELD</span>
+        </div>
 
-  <div class="logo">
-    <span>
-      NOPE.
-      <div class="strike"></div>
-    </span>
-  </div>
+        <h1 class="logo">
+            <span>NOPE<span class="strike"></span></span>
+        </h1>
 
-  <div class="tagline">Your personal misinformation detector</div>
+        <p class="tagline">Your personal misinformation & scam detector</p>
 
-  <h1 class="headline">
-    Got a suspicious message?<br>
-    A <span class="highlight">"miracle cure"</span> your friend forwarded?<br>
-    Let's find out if it's real.
-  </h1>
+        <h2 class="headline">
+            Got a suspicious message?<br>
+            A <span class="highlight">"miracle cure"</span> your friend forwarded?<br>
+            Let's find out if it's real.
+        </h2>
 
-  <p class="subtext">
-    Paste any message, headline, or health tip into NOPE. We'll give you a straight, plain-English answer — real news or rubbish — in seconds.
-  </p>
+        <p class="subtext">
+            Paste any message, headline, health tip — or that weirdly affectionate text from someone on an oil rig — into NOPE. We'll give you a straight, plain-English answer in seconds.
+        </p>
 
-  <div class="hero-cta">
-    <a href="/static/chat.html" class="cta-btn">
-      Check Something Now
-      <span class="arrow">&rarr;</span>
-    </a>
-  </div>
+        <div class="hero-cta">
+            <a href="/static/chat.html" class="cta-btn">
+                Check Something Now
+                <span class="arrow">→</span>
+            </a>
+        </div>
 
-  <div class="scroll-hint">
-    <span>See how it works</span>
-    <div class="scroll-arrow"></div>
-  </div>
-</section>
+        <div class="scroll-hint">
+            <span>See how it works</span>
+            <div class="scroll-arrow"></div>
+        </div>
+    </section>
 
-<!-- ── TRUST BAR ──────────────────────────────── -->
-<div class="trust-bar">
-  <div class="trust-item"><span class="icon">🔒</span> No personal data collected</div>
-  <div class="trust-item"><span class="icon">⚡</span> Results in seconds</div>
-  <div class="trust-item"><span class="icon">💬</span> Plain English — no jargon</div>
-  <div class="trust-item"><span class="icon">🆓</span> Completely free</div>
-</div>
+    <!-- CARDS SECTION -->
+    <section class="cards-section">
+        <div class="section-label">What NOPE can spot</div>
 
-<!-- ── WHAT IT CATCHES ────────────────────────── -->
-<section class="cards-section">
-  <div class="section-label">What NOPE can spot</div>
-  <div class="cards">
-    <div class="card">
-      <div class="card-emoji">📱</div>
-      <h3>The WhatsApp Forward</h3>
-      <p>"Lemon water cures everything." "Banks are closing Thursday." "Forward this to 10 people." If it arrived via a chain message, it deserves a second look.</p>
+        <div class="cards">
+            <div class="card">
+                <div class="card-emoji">📱</div>
+                <h3>The WhatsApp Forward</h3>
+                <p>"Lemon water cures everything." "Banks are closing Thursday." "Forward this to 10 people." If it arrived via a chain message, it deserves a second look.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-emoji">📰</div>
+                <h3>The Alarming Headline</h3>
+                <p>Something that made your stomach drop — but felt a bit… off. Real news rarely needs to scream. NOPE can tell the difference between alarming and just alarm-baiting.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-emoji">💊</div>
+                <h3>The "Miracle" Health Tip</h3>
+                <p>Doctors don't want you to know this one trick. Except they do. It's called medicine, and it's been around a while. Let NOPE check before you change your routine.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SCAM SHIELD SECTION -->
+    <section class="scam-section">
+        <div class="section-label">New: Scam Shield</div>
+
+        <h2>Same NOPE. Same paste-and-check.<br>Now it catches scams too.</h2>
+        <p class="scam-intro-text">
+            Misinformation is one thing. But some messages aren't just wrong — they're after your money, your heart, or both. NOPE now spots those too.
+        </p>
+
+        <div class="scam-cards">
+            <div class="scam-card authority">
+                <div class="scam-icon">🏛️</div>
+                <span class="scam-tag">Authority + Urgency</span>
+                <h3>Government Impersonation</h3>
+                <p class="scam-example">"Pay this tax bill in 24 hours or face arrest."</p>
+                <p class="scam-tell">Real tax offices don't accept Bitcoin. <strong>That's your first clue.</strong> Real ones also don't panic you into paying before breakfast.</p>
+            </div>
+
+            <div class="scam-card romance">
+                <div class="scam-icon">💕</div>
+                <span class="scam-tag">Emotion + Isolation</span>
+                <h3>Romance Scams</h3>
+                <p class="scam-example">"I'm stuck on an oil rig and lost my wallet."</p>
+                <p class="scam-tell">Love shouldn't cost a wire transfer. <strong>Surprisingly common advice to need.</strong> If they're in crisis and need cash, they're not who they say they are.</p>
+            </div>
+
+            <div class="scam-card financial">
+                <div class="scam-icon">🏦</div>
+                <span class="scam-tag">Fear + Panic</span>
+                <h3>Financial Fraud</h3>
+                <p class="scam-example">"Your account is suspended. Click here immediately."</p>
+                <p class="scam-tell">Your bank has your number. <strong>They'd just call.</strong> Any message designed to make you panic and click is designed to make you panic and click.</p>
+            </div>
+        </div>
+
+        <p class="scam-footer-note">
+            Not sure if it's a scam? That's exactly what NOPE is for. Paste it in. We'll tell you.
+        </p>
+
+        <a href="/static/chat.html" class="cta-btn">
+            Check it now — it's free
+            <span class="arrow">→</span>
+        </a>
+    </section>
+
+    <!-- HOW IT WORKS SECTION -->
+    <section class="how-section">
+        <h2>Three steps.<br>That's genuinely it.</h2>
+        <p class="how-subtext">No account. No download. No asking your grandkid for help.</p>
+
+        <div class="step-list">
+            <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-text">
+                    <strong>Find the content</strong>
+                    <span>A message, headline, post — anything that made you wonder "is this actually true?"</span>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-text">
+                    <strong>Paste it into NOPE</strong>
+                    <span>The whole thing, typos and all. We're not grading your spelling.</span>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-text">
+                    <strong>Get a clear answer</strong>
+                    <span>Real or rubbish — explained plainly, without making you feel silly for asking.</span>
+                </div>
+            </div>
+        </div>
+
+        <a href="/static/chat.html" class="cta-btn">
+            Give it a try — it's free
+            <span class="arrow">→</span>
+        </a>
+    </section>
+
+    <!-- EXAMPLES SECTION -->
+    <section class="examples-section">
+        <h2>Things people have already checked</h2>
+        <p class="sub">Sound familiar?<br><br>You're not alone. These kinds of messages land in millions of inboxes every day. There's no shame in double-checking — in fact, it's the smart move.</p>
+
+        <div class="example-pills">
+            <div class="pill">🍋 "Lemon water cures cancer"</div>
+            <div class="pill">📢 "Banks will close this Friday"</div>
+            <div class="pill">💉 "The vaccine has a microchip"</div>
+            <div class="pill">🧄 "Garlic kills all viruses"</div>
+            <div class="pill">📲 "Forward or something bad will happen"</div>
+            <div class="pill">🏥 "Hospitals are hiding a cheap cure"</div>
+            <div class="pill">📸 "This photo proves it"</div>
+            <div class="pill">💸 "The government is stealing your pension"</div>
+
+            <div class="pill-divider">And now, scams too</div>
+
+            <div class="pill scam">🏛️ "Pay this fine or face arrest"</div>
+            <div class="pill scam">💕 "I'm stuck abroad and need £500"</div>
+            <div class="pill scam">🏦 "Your account has been suspended"</div>
+            <div class="pill scam">📦 "Your parcel is held — pay now"</div>
+            <div class="pill scam">💰 "You've won! Click to claim"</div>
+            <div class="pill scam">👴 "Grandma, it's me — don't tell mum"</div>
+        </div>
+    </section>
+
+    <!-- TESTIMONIALS SECTION -->
+    <section class="testimonials-section">
+        <h2 class="testimonials-title">What people are saying</h2>
+        <p style="text-align: center; color: var(--soft-gray); margin-bottom: 3rem;">Real people. Real forwards. Real relief.</p>
+
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p class="quote">"My sister sends me 12 health tips a day. I used to just nod and worry. Now I check them. She's wrong about 11 of them."</p>
+                <p class="attrib">— Margaret, 71, retired teacher</p>
+            </div>
+
+            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p class="quote">"I almost forwarded something about bananas curing diabetes to my entire book club. NOPE saved me the embarrassment."</p>
+                <p class="attrib">— Derek, 68, very relieved</p>
+            </div>
+
+            <div class="testimonial-card scam-testimonial">
+                <div class="stars">★★★★★</div>
+                <p class="quote">"I got a text saying my parcel was held and to pay £3. I pasted it into NOPE. Scam. I've never felt so clever in my life."</p>
+                <p class="attrib">— Brenda, 73, now suspicious of all parcels</p>
+            </div>
+
+            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p class="quote">"I checked a story about the government putting chips in tea bags. NOPE said false. My husband is devastated."</p>
+                <p class="attrib">— Elaine, 66, married to a conspiracy theorist</p>
+            </div>
+
+            <div class="testimonial-card scam-testimonial">
+                <div class="stars">★★★★★</div>
+                <p class="quote">"A very handsome man on Facebook said he was a widowed engineer offshore and needed help. NOPE spotted it immediately. Saved me from a very expensive pen pal."</p>
+                <p class="attrib">— Maureen, 69, still a little disappointed</p>
+            </div>
+
+            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p class="quote">"I've checked 47 things in two weeks. I haven't been right once. Turns out the internet is mostly nonsense. Who knew."</p>
+                <p class="attrib">— Gloria, 70, now deeply suspicious of everything</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA SECTION -->
+    <section class="cta-area">
+        <p class="thought-bubble">
+            You've survived a lot. Bad haircuts. The Y2K scare. Your nephew's crypto advice. You deserve a tool that has your back — and doesn't talk down to you.
+        </p>
+
+        <a href="/static/chat.html" class="cta-btn">
+            Check Something Now — It's Free
+            <span class="arrow">→</span>
+        </a>
+
+        <p class="fine-print">
+            Takes <strong>under 2 minutes</strong> · No account needed · Works on any device
+        </p>
+    </section>
+
+    <!-- TRUST BAR -->
+    <div class="trust-bar">
+        <div class="trust-item">
+            <span class="icon">🔒</span>
+            <span>No personal data collected</span>
+        </div>
+        <div class="trust-item">
+            <span class="icon">⚡</span>
+            <span>Results in seconds</span>
+        </div>
+        <div class="trust-item">
+            <span class="icon">💬</span>
+            <span>Plain English — no jargon</span>
+        </div>
+        <div class="trust-item">
+            <span class="icon">🛡️</span>
+            <span>Scam Shield included</span>
+        </div>
     </div>
-    <div class="card">
-      <div class="card-emoji">📰</div>
-      <h3>The Alarming Headline</h3>
-      <p>Something that made your stomach drop — but felt a bit… off. Real news rarely needs to scream. NOPE can tell the difference between alarming and just alarm-baiting.</p>
-    </div>
-    <div class="card">
-      <div class="card-emoji">💊</div>
-      <h3>The "Miracle" Health Tip</h3>
-      <p>Doctors don't want you to know this one trick. Except they do. It's called medicine, and it's been around a while. Let NOPE check before you change your routine.</p>
-    </div>
-  </div>
-</section>
 
-<!-- ── HOW IT WORKS ───────────────────────────── -->
-<section class="how-section">
-  <h2>Three steps.<br>That's genuinely it.</h2>
-  <p class="how-subtext">No account. No download. No asking your grandkid for help.</p>
+    <!-- FOOTER -->
+    <footer>
+        <p>NOPE. — Because "just Google it" is not a strategy. And neither is guessing.</p>
+    </footer>
 
-  <div class="step-list">
-    <div class="step">
-      <div class="step-num">1</div>
-      <div class="step-text">
-        <strong>Find the content</strong>
-        <span>A message, headline, post — anything that made you wonder "is this actually true?"</span>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <div class="step-text">
-        <strong>Paste it into NOPE</strong>
-        <span>The whole thing, typos and all. We're not grading your spelling.</span>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <div class="step-text">
-        <strong>Get a clear answer</strong>
-        <span>Real or rubbish — explained plainly, without making you feel silly for asking.</span>
-      </div>
-    </div>
-  </div>
-
-  <a href="/static/chat.html" class="cta-btn" style="background: var(--mint); color: var(--navy);">
-    Give it a try — it's free
-    <span class="arrow">&rarr;</span>
-  </a>
-</section>
-
-<!-- ── EXAMPLES ───────────────────────────────── -->
-<section class="examples-section">
-  <div class="section-label">Things people have already checked</div>
-  <h2>Sound familiar?</h2>
-  <p class="sub">You're not alone. These kinds of messages land in millions of inboxes every day. There's no shame in double-checking — in fact, it's the smart move.</p>
-
-  <div class="example-pills">
-    <div class="pill">🍋 &ldquo;Lemon water cures cancer&rdquo;</div>
-    <div class="pill gold">📢 &ldquo;Banks will close this Friday&rdquo;</div>
-    <div class="pill">💉 &ldquo;The vaccine has a microchip&rdquo;</div>
-    <div class="pill mint">🧄 &ldquo;Garlic kills all viruses&rdquo;</div>
-    <div class="pill">📲 &ldquo;Forward or something bad will happen&rdquo;</div>
-    <div class="pill gold">🏥 &ldquo;Hospitals are hiding a cheap cure&rdquo;</div>
-    <div class="pill">📸 &ldquo;This photo proves it&rdquo;</div>
-    <div class="pill mint">💸 &ldquo;The government is stealing your pension&rdquo;</div>
-  </div>
-</section>
-
-<!-- ── TESTIMONIALS ───────────────────────────── -->
-<section class="testimonials-section">
-  <div class="section-label">What people are saying</div>
-  <h2 class="testimonials-title">Real people. Real forwards. Real relief.</h2>
-  <div class="testimonials-grid">
-
-    <div class="testimonial-card">
-      <div class="stars">★★★★★</div>
-      <p class="quote">"My sister sends me 12 health tips a day. I used to just nod and worry. Now I check them. She's wrong about 11 of them."</p>
-      <div class="attrib">— Margaret, 71, retired teacher</div>
-    </div>
-
-    <div class="testimonial-card">
-      <div class="stars">★★★★★</div>
-      <p class="quote">"I almost forwarded something about bananas curing diabetes to my entire book club. NOPE saved me the embarrassment."</p>
-      <div class="attrib">— Derek, 68, very relieved</div>
-    </div>
-
-    <div class="testimonial-card">
-      <div class="stars">★★★★★</div>
-      <p class="quote">"My son keeps telling me to 'just Google it.' I tried NOPE instead. It's like Google, but it actually answers the question."</p>
-      <div class="attrib">— Patricia, 74, done being patronised</div>
-    </div>
-
-    <div class="testimonial-card">
-      <div class="stars">★★★★★</div>
-      <p class="quote">"I checked a story about the government putting chips in tea bags. NOPE said false. My husband is devastated."</p>
-      <div class="attrib">— Elaine, 66, married to a conspiracy theorist</div>
-    </div>
-
-    <div class="testimonial-card">
-      <div class="stars">★★★★★</div>
-      <p class="quote">"Finally a tool that doesn't make me feel stupid for asking. NOPE explains things like I'm an adult — because I am one."</p>
-      <div class="attrib">— Frank, 79, lifelong sceptic</div>
-    </div>
-
-    <div class="testimonial-card">
-      <div class="stars">★★★★★</div>
-      <p class="quote">"I've checked 47 things in two weeks. I haven't been right once. Turns out the internet is mostly nonsense. Who knew."</p>
-      <div class="attrib">— Gloria, 70, now deeply suspicious of everything</div>
-    </div>
-
-  </div>
-</section>
-
-<!-- ── FINAL CTA ───────────────────────────────── -->
-<section class="cta-area">
-  <div class="thought-bubble">
-    You've survived a lot. Bad haircuts. The Y2K scare. Your nephew's crypto advice. You deserve a tool that has your back — and doesn't talk down to you.
-  </div>
-
-  <a href="/static/chat.html" class="cta-btn">
-    Check Something Now — It's Free
-    <span class="arrow">&rarr;</span>
-  </a>
-
-  <p class="fine-print">
-    Takes <strong>under 2 minutes</strong> &middot; No account needed &middot; Works on any device
-  </p>
-</section>
-
-<footer>
-  NOPE. &mdash; Because &ldquo;just Google it&rdquo; is not a strategy. And neither is guessing.
-</footer>
-
+    <script>
+        document.querySelectorAll('a[href*="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
